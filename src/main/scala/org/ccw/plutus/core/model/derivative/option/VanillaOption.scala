@@ -6,7 +6,7 @@ import org.ccw.plutus.core.model.Instrument
 trait VanillaOption {
 	val strikePrice :BigDecimal
 	val expiryDate :Date
-	val exerciseStyle :ExerciseStyle
+	val settlementStyle :SettlementStyle
 	val underlyingInstrument : Instrument
 	
 	def payOffOnExpiry(spotPrice :BigDecimal) :BigDecimal = {

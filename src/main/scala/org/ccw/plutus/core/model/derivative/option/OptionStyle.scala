@@ -5,5 +5,5 @@ trait EuropeanOption {
 }
 
 trait AmericanOption {
-	def isEarlyExercisable :Boolean = false
+	def isEarlyExercisable :Boolean = true
 }
