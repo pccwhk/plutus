@@ -2,6 +2,7 @@ package org.ccw.plutus.core.model.derivative.option
 
 import java.util.Date
 import org.ccw.plutus.core.model.base.Instrument
+import org.ccw.plutus.core.model.derivative.option.SettlementStyle._
 
 
 trait VanillaOption {
