@@ -16,17 +16,26 @@
 	</licenses>
 
 	<properties>
-		<maven.compiler.source>1.5</maven.compiler.source>
-		<maven.compiler.target>1.5</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 		<scala.version>2.10.2</scala.version>
 	</properties>
 
-	<!-- <repositories> <repository> <id>scala-tools.org</id> <name>Scala-Tools 
-		Maven2 Repository</name> <url>http://scala-tools.org/repo-releases</url> 
-		</repository> </repositories> <pluginRepositories> <pluginRepository> <id>scala-tools.org</id> 
-		<name>Scala-Tools Maven2 Repository</name> <url>http://scala-tools.org/repo-releases</url> 
-		</pluginRepository> </pluginRepositories> -->
+	<repositories>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-Tools Maven2 Repository</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-test.org</id>
+			<name>Scala-Test Maven2 Repository</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 
 	<dependencies>
@@ -40,6 +49,7 @@
 
 
 		<!-- Test -->
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -47,12 +57,12 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.scala-tools.testing</groupId> <artifactId>specs_${scala.version}</artifactId> 
-			<version>1.6.5</version> <scope>test</scope> </dependency> <dependency> <groupId>org.scalatest</groupId> 
-			<artifactId>scalatest</artifactId> <version>1.2</version> <scope>test</scope> 
-			</dependency> -->
-
-
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.10</artifactId>
+			<version>2.1.3</version>
+			<scope>test</scope>
+		</dependency>
 
 
 		<dependency>
@@ -106,24 +116,62 @@
 			</plugin>
 
 
+			<!-- disable surefire -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<!-- enable scalatest -->
+			<plugin>
+				<groupId>org.scalatest</groupId>
+				<artifactId>scalatest-maven-plugin</artifactId>
+				<version>1.0-RC2</version>
+				<configuration>
+					<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+					<junitxml>.</junitxml>
+					<filereports>WDF TestSuite.txt</filereports>
+				</configuration>
+				<executions>
+					<execution>
+						<id>test</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+
 			<plugin>
 
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
-				<version>3.1.5</version>
-				<!-- 
+				<version>3.1.6</version>
+				<!-- <executions> <execution> <id>java-compile-first</id> <phase>process-resources</phase> 
+					<goals> <goal>add-source</goal> <goal>compile</goal> </goals> </execution> 
+					</executions> -->
 				<executions>
 					<execution>
-						<id>java-compile-first</id>
-						<phase>process-resources</phase>
 						<goals>
-							<goal>add-source</goal>
 							<goal>compile</goal>
+							<goal>testCompile</goal>
 						</goals>
 					</execution>
-					
+
 				</executions>
-				 -->
+
+
+				<configuration>
+					<sourceDir>src/main/scala</sourceDir>
+					<jvmArgs>
+						<jvmArg>-Xms512m</jvmArg>
+						<jvmArg>-Xmx1024m</jvmArg>
+					</jvmArgs>
+				</configuration>
 			</plugin>
 
 		</plugins>
