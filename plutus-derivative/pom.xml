@@ -1,11 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.ccw</groupId>
+	
+	<parent>
+		<groupId>org.ccw</groupId>
+		<artifactId>plutus</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	
+	
 	<artifactId>plutus-derivative</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	
 	<name>${project.artifactId}</name>
-	<description>My wonderfull scala app</description>
+	<description>Derivative Module for Plutus</description>
 	<inceptionYear>2010</inceptionYear>
 	<licenses>
 		<license>
@@ -15,12 +22,6 @@
 		</license>
 	</licenses>
 
-	<properties>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<encoding>UTF-8</encoding>
-		<scala.version>2.10.2</scala.version>
-	</properties>
 
 	<repositories>
 		<repository>
@@ -74,6 +75,7 @@
 	</dependencies>
 
 	<build>
+	
 
 		<plugins>
 
