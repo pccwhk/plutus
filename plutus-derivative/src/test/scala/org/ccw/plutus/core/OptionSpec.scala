@@ -10,9 +10,12 @@ import java.util.Date
 @RunWith(classOf[JUnitRunner])
 class MyOptionSpec extends FlatSpec {
 
-  "An Amercian Call " should " do something " in {
+  "An Amercian Call " should " be early exercisable " in {
 	  val stock = new Equity(1, "0005", "HSBC")
-	  val call = new AmericanCallOption( stock, BigDecimal("80"), new Date)
+	  val americanCall = new AmericanCallOption( stock, BigDecimal("80"), new Date)
+	  assertResult(true) {
+		  americanCall.isEarlyExercisable
+	  }
   }
 
 }
