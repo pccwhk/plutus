@@ -17,5 +17,6 @@ trait OptionPricingModel {
       currentDate :LocalDate, optionPrice :BigDecimal, underlyingPrice :BigDecimal) :BigDecimal
       
   def getOptionPrice (option :VanillaOption, 
-      currentDate :LocalDate,  volatility :BigDecimal) :BigDecimal 
+      currentDate :LocalDate, spotPrice :BigDecimal,  
+      volatility :BigDecimal) :BigDecimal 
 }

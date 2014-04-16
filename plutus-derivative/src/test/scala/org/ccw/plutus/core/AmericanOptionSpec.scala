@@ -8,16 +8,26 @@ import org.ccw.plutus.core.model.equities.Stock
 import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.derivative.option.pricing.BinomialOptionModel
 import org.joda.time.LocalDate
+import org.scalatest.BeforeAndAfter
 
 @RunWith(classOf[JUnitRunner])
-class AmericanOptionSpec extends FlatSpec {
+class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
 
-  "An Amercian Call " should " be early exercisable " in {
-    val stock = new Stock(1, "0005", "HSBC", "HKEX")
-    val expiryDate = new LocalDate(2014, 1, 10)
-    val settlementDate = new LocalDate(2014, 1, 12)
-    val americanCall = new AmericanCallOption(stock, BigDecimal("80"),
+  var stock :Stock = _
+  var expiryDate :LocalDate =_
+  var settlementDate :LocalDate =_
+  var americanCall :AmericanCallOption =_
+  
+  before {
+    stock = new Stock(1, "0005", "HSBC", "HKEX")
+    expiryDate = new LocalDate(2014, 1, 10)
+    settlementDate = new LocalDate(2014, 1, 12)
+    americanCall = new AmericanCallOption(stock, BigDecimal("80"),
       settlementDate, expiryDate)
+  }
+  
+  "An Amercian Call " should " be early exercisable " in {
+    
 
     val now = expiryDate.minusDays(2)
     
@@ -31,20 +41,26 @@ class AmericanOptionSpec extends FlatSpec {
     
   }
 
-  "An American Call" should " be able to calc price with dividend payment " in {
-    val stock = new Stock(1, "0005", "HSBC", "HKEX")
-    val expiryDate = new LocalDate(2014, 1, 10)
-    val settlementDate = new LocalDate(2014, 1, 12)
-    val americanCall = new AmericanCallOption(stock, BigDecimal("80"),
-      settlementDate, expiryDate)
+  "An American Call" should " be able to calc option price without dividend payment " in {
+    
     val stockPrice = BigDecimal("85")
-    val optionPrice = BigDecimal("5")
+    val volatility = BigDecimal("0.5")
     
     val today = expiryDate.minusDays(2)
     
-    BinomialOptionModel.getImpliedVolatility(americanCall, today,
-      optionPrice, stockPrice);
-
+    val optionPrice = BinomialOptionModel.getOptionPrice(americanCall, 
+        today, stockPrice , volatility)
+        
+        // it should be non-negative
+     assert(optionPrice >= BigDecimal("0"))
+    	  
+    
+  }
+  
+  "An American Call" should " be able to calc price with dividend payment " in {
+    
+    
+    
   }
 
 }

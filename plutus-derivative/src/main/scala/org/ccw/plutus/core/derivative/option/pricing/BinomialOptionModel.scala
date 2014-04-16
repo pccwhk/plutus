@@ -12,8 +12,24 @@ object BinomialOptionModel extends OptionPricingModel{
    }
       
   def getOptionPrice (option :VanillaOption, 
-      currentDate :LocalDate,  volatility :BigDecimal) :BigDecimal ={
-     throw new Exception();
+      currentDate :LocalDate, spotPrice :BigDecimal,  
+      volatility :BigDecimal) :BigDecimal ={
+     
+    if (currentDate.isBefore(option.expiryDate)) {
+      // not yet expired
+      
+      
+      
+      BigDecimal("-1")
+    } 
+    else if (currentDate.isEqual(option.expiryDate)){     
+      option.payOffOnExpiry(spotPrice)
+    }
+    else {
+      // expired 
+      BigDecimal("0")
+    }
+    
    }
   
 }
