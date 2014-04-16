@@ -1,4 +1,4 @@
-package org.ccw.plutus.core.model.derivative.option
+package org.ccw.plutus.core.derivative.option.model
 
 object SettlementStyle extends Enumeration{
   type SettlementStyle = Value

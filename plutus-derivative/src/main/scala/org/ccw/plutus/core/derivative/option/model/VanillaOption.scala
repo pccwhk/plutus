@@ -1,11 +1,11 @@
-package org.ccw.plutus.core.model.derivative.option
+package org.ccw.plutus.core.derivative.option.model
 
 import java.util.Date
 import org.ccw.plutus.core.model.base.Instrument
-import org.ccw.plutus.core.model.derivative.option.SettlementStyle._
+import org.ccw.plutus.core.derivative.option.model.SettlementStyle._
 
 
-trait VanillaOption {
+trait VanillaOption extends Exercisable{
 	val strikePrice :BigDecimal
 	val expiryDate :Date
 	val settlementStyle :SettlementStyle

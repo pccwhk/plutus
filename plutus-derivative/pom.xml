@@ -22,7 +22,7 @@
 		</license>
 	</licenses>
 
-
+<!-- 
 	<repositories>
 		<repository>
 			<id>scala-tools.org</id>
@@ -30,6 +30,7 @@
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>scala-test.org</id>
@@ -37,7 +38,7 @@
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
-
+ -->
 
 	<dependencies>
 		<dependency>

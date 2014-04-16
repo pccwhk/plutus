@@ -1,4 +1,4 @@
-package org.ccw.plutus.core.model.derivative.option
+package org.ccw.plutus.core.derivative.option.model
 
 import java.util.Date
 
@@ -7,10 +7,10 @@ trait Exercisable{
   def isExercisableNow(now :Date) :Boolean
 }
 
-trait EuropeanOption extends Exercisable {
+trait EuropeanStyle extends Exercisable {
 	def isEarlyExercisable :Boolean = false
 }
 
-trait AmericanOption extends Exercisable {
+trait AmericanStyle extends Exercisable {
 	def isEarlyExercisable :Boolean = true
 }
