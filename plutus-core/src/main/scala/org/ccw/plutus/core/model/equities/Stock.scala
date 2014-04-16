@@ -1,9 +1,13 @@
-package org.ccw.plutus.core.model.base
+package org.ccw.plutus.core.model.equities
+
+import org.ccw.plutus.core.model.base.Instrument
+import org.ccw.plutus.core.model.base.InstrumentType
+import org.ccw.plutus.core.model.equities.EquityType._;
 
 
 
-class Equity(id :Long,  symbol :String,  displayName :String)  
-	extends Instrument(id,  symbol,  displayName, InstrumentType.EQUITY){
-  
+class Stock(id :Long,  symbol :String,  displayName :String)  
+	extends Equity(id,  symbol,  displayName, EQUITY){
+	
   
   }

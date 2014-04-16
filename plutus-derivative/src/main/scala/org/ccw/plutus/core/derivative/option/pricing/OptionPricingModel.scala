@@ -13,7 +13,7 @@ trait OptionStatistic {
 trait OptionPricingModel {
 
   def getImpliedVolatility (option :VanillaOption, 
-      currentDate :Date, optionPrice :BigDecimal) :BigDecimal
+      currentDate :Date, optionPrice :BigDecimal, underlyingPrice :BigDecimal) :BigDecimal
       
   def getOptionPrice (option :VanillaOption, 
       currentDate :Date,  volatility :BigDecimal) :BigDecimal 
