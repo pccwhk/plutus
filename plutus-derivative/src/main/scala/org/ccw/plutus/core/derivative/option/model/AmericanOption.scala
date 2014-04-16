@@ -1,22 +1,22 @@
 package org.ccw.plutus.core.derivative.option.model
 
-import java.util.Date
 import org.ccw.plutus.core.model.base.Instrument
 import org.ccw.plutus.core.derivative.option.model.SettlementStyle._
+import org.joda.time.LocalDate
 
 class AmericanCallOption(
   val underlyingInstrument: Instrument,
   val strikePrice: BigDecimal,
-  val expiryDate: Date)
+  val settlementDate: LocalDate,
+  val expiryDate: LocalDate)
 
   extends VanillaCallOption with AmericanStyle {
 
-  def isExercisableNow(now: Date): Boolean = {
-    true
+  def isExercisableNow(now: LocalDate): Boolean = {
+    now.isBefore(expiryDate)
   }
 
   val settlementStyle = PHYSICAL_SETTLE
-  
 
 }
 

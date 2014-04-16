@@ -6,8 +6,8 @@ import org.ccw.plutus.core.model.equities.EquityType._;
 
 
 
-class Stock(id :Long,  symbol :String,  displayName :String)  
-	extends Equity(id,  symbol,  displayName, EQUITY){
+class Stock(id :Long,  symbol :String,  displayName :String, exchange:String)  
+	extends ListedEquity(id,  symbol,  displayName, EQUITY, exchange){
 	
   
   }

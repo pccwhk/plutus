@@ -14,3 +14,9 @@ class Equity(id :Long,  symbol :String,  displayName :String,
 	extends Instrument(id,  symbol,  displayName, InstrumentType.EQUITY){
 
 }
+
+class ListedEquity(id :Long,  symbol :String,  displayName :String, 
+    equityType :EquityType.EquityType, exchange :String)  
+	extends Equity(id,  symbol,  displayName, equityType){
+
+}

@@ -1,8 +1,9 @@
 package org.ccw.plutus.core.derivative.option.pricing
 
 
-import java.util.Date
+
 import org.ccw.plutus.core.derivative.option.model.VanillaOption
+import org.joda.time.LocalDate
 
 
 trait OptionStatistic {
@@ -13,8 +14,8 @@ trait OptionStatistic {
 trait OptionPricingModel {
 
   def getImpliedVolatility (option :VanillaOption, 
-      currentDate :Date, optionPrice :BigDecimal, underlyingPrice :BigDecimal) :BigDecimal
+      currentDate :LocalDate, optionPrice :BigDecimal, underlyingPrice :BigDecimal) :BigDecimal
       
   def getOptionPrice (option :VanillaOption, 
-      currentDate :Date,  volatility :BigDecimal) :BigDecimal 
+      currentDate :LocalDate,  volatility :BigDecimal) :BigDecimal 
 }
