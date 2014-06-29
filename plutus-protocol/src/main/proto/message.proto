@@ -1,0 +1,13 @@
+package org.ccw.plutus.proto;
+
+message SQLRequest {
+  required string requestId  = 1;
+  required string host = 2;
+  required string sql = 3;
+  required string user = 4; 
+}
+
+message SQLResponse {
+   required SQLRequest request = 1;
+   required string result = 2;
+}
