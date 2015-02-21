@@ -10,7 +10,7 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<encoding>UTF-8</encoding>
-		<scala.version>2.10.4</scala.version>
+		<scala.version>2.11.5</scala.version>
 		<slf4j.version>1.7.5</slf4j.version>
     </properties>
 	

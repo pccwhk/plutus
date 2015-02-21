@@ -41,6 +41,7 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
     
   }
 
+/*  
   "An American Call" should " be able to calc option price without dividend payment " in {
     
     val stockPrice = BigDecimal("85")
@@ -55,7 +56,7 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
      assert(optionPrice >= BigDecimal("0"))
     	  
     
-  }
+  }*/
   
   "An American Call" should " be able to calc price with dividend payment " in {
     
