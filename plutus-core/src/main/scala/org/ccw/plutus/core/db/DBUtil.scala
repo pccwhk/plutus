@@ -1,54 +1,69 @@
 package org.ccw.plutus.core.db
 
-import com.jolbox.bonecp.BoneCP
-import com.jolbox.bonecp.BoneCPConfig
-import com.jolbox.bonecp.BoneCPDataSource
+import org.slf4j.Logger
+import java.sql.Connection
+import javax.sql.DataSource
+import scala.collection.mutable.{ Map => MutableMap }
+import org.slf4j.LoggerFactory
 
-class DBUtil {
-		val config = new BoneCPConfig();
-			config.setJdbcUrl("jdbc:h2:mem:test"); // jdbc url specific to your database, eg jdbc:mysql://127.0.0.1/yourdb
-			config.setUsername("sa"); 
-			config.setPassword("");
-			config.setMinConnectionsPerPartition(1);
-			config.setMaxConnectionsPerPartition(99);
-			config.setPartitionCount(1);
-		val connectionPool = new BoneCP(config); // setup the connection pool
-		
-		val ds = new BoneCPDataSource();  // create a new datasource object
- 	ds.setJdbcUrl("jdbc:h2:mem:test");		// set the JDBC url
-	ds.setUsername("sa");				// set the username
-	ds.setPassword("");	
-	ds.setMinConnectionsPerPartition(1);
-	ds.setMaxConnectionsPerPartition(1);
-	ds.setPartitionCount(2)
-
+trait DBAdapter {
+  
+  def getConnection :Connection
 }
 
-object Main {
-  def main(args: Array[String]) {
-	  val a = new DBUtil
-	  val t = System.nanoTime()
-	  val get = a.ds
-	  
-	   for( i <- 1 to 10){
-	     val c = get.getConnection() 
-	    
-	     
-		  //val c = get.getConnection()
-		  println(i + " " + c.isValid(100))
-		  
-		  c.close()
-		  if (c.isClosed()) {
-		    println("connection is closed")
-		  }
-	     val  j = get.getTotalLeased()
-	      
-	     
-	     println(s"leased = $j" )
-		  
-	  }
-	  val j = (System.nanoTime() - t)/1000000000.0
-	  println(j)
-	  get.close()
+object DBUtil
+
+class DBUtil(dbAdapter :DBAdapter) {
+
+  val logger: Logger = LoggerFactory.getLogger(DBUtil.getClass())
+
+  val threadLocalConnections = new ThreadLocal[MutableMap[String, Connection]] {
+    protected override def initialValue(): MutableMap[String, Connection] = {
+      MutableMap[String, Connection]()
+    }
+  }
+
+  def withThreadLocalConnection[T](connectionName: String)(f: Connection => T): T = {
+    val (connection, isFirst) = getThreadLocalConnection(connectionName)
+    try {
+      f(connection)
+    } finally {
+      if (isFirst)
+        releaseThreadLocalConnection(connectionName)
+    }
+  }
+
+  // return (connnection, isConnectionGetter)
+  def getThreadLocalConnection(connectionName: String): (Connection, Boolean) = {
+    val m = threadLocalConnections.get()
+    if (m.get(connectionName) == None) {
+      val c = dbAdapter.getConnection
+      logger.debug(s"Getting a new connection from pool for $connectionName ${Thread.currentThread()} {connection = ${c}}")
+      m.put(connectionName, c)
+      (c, true)
+    } else {
+      val c = m.get(connectionName).get
+      logger.debug(s"Getting a new connection from ThreadLocal for $connectionName ${Thread.currentThread()} {connection = ${c}}")
+      (c, false)
+    }
+  }
+
+  def releaseThreadLocalConnection(connectionName: String) = {
+    val m = threadLocalConnections.get()
+    if (m.get(connectionName) == None) {
+      // throw exception
+      logger.debug(s"Cannot find a connection to release by ${Thread.currentThread()}")
+      throw new Exception
+    } else {
+      // remove the connection from thread local 
+      val c = m.remove(connectionName)
+      if (c != None) {
+        logger.debug(s"Trying to release connection by ${Thread.currentThread()} {connection = ${c.get}}")
+        try {
+          c.get.close
+          logger.debug(s"Release connection by ${Thread.currentThread()} successfully")
+        }
+      }
+    }
   }
 }
