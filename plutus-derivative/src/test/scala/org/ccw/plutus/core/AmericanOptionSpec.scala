@@ -9,11 +9,11 @@ import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.derivative.option.pricing.BinomialOptionModel
 import org.joda.time.LocalDate
 import org.scalatest.BeforeAndAfter
+
 import scala.collection.mutable.Queue
 
 @RunWith(classOf[JUnitRunner])
 class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
-
   var stock: Stock = _
   var expiryDate: LocalDate = _
   var settlementDate: LocalDate = _
@@ -21,9 +21,9 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
 
   before {
     stock = new Stock(1, "0005", "HSBC", "HKEX")
-    expiryDate = new LocalDate(2014, 1, 10)
-    settlementDate = new LocalDate(2014, 1, 12)
-    americanCall = new AmericanCallOption(stock, BigDecimal("80"),
+    expiryDate = new LocalDate(2014, 1, 31)
+    settlementDate = new LocalDate(2014, 1, 31)
+    americanCall = new AmericanCallOption(stock, BigDecimal("25"),
       settlementDate, expiryDate)
   }
 
@@ -51,15 +51,18 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
 
   "An American Call" should " be able to calc option price without dividend payment " in {
 
-    val stockPrice = BigDecimal("85")
-    val volatility = BigDecimal("0.5")
+    val stockPrice = BigDecimal("24")
+    val volatility = BigDecimal("0.2")
+    val r = BigDecimal("0.001")
 
-    val today = expiryDate.minusDays(2)
+    val today = expiryDate.minusDays(30)
 
     val optionPrice = BinomialOptionModel.getOptionPrice(americanCall,
-      today, stockPrice, volatility)
+      today, stockPrice, r, volatility)
 
     // it should be non-negative
+
+    println(s"option Price = $optionPrice")
     assert(optionPrice >= BigDecimal("0"))
 
   }
