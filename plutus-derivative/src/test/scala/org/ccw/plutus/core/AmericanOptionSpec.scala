@@ -30,9 +30,9 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
   "recurvie call " should " work " in {
     val initQ = Queue[Double]()
     initQ.enqueue(5)
-    val n = 100
-    val q = BinomialOptionModel.helper(initQ, List[Double](), 2, 0.5, 1, n, true).toList
-    println(q.last)
+    val n = 4
+    val q = BinomialOptionModel.generatePriceTree(initQ, List[Double](), 2, 0.5, 1, n, true)
+    //BinomialOptionModel.getPriceTreeAtNode(q, 3) foreach println
   }
 
   "An Amercian Call " should " be early exercisable " in {
@@ -51,11 +51,11 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
 
   "An American Call" should " be able to calc option price without dividend payment " in {
 
-    val stockPrice = BigDecimal("24")
+    val stockPrice = BigDecimal("25")
     val volatility = BigDecimal("0.2")
     val r = BigDecimal("0.001")
 
-    val today = expiryDate.minusDays(30)
+    val today = expiryDate.minusDays(2)
 
     val optionPrice = BinomialOptionModel.getOptionPrice(americanCall,
       today, stockPrice, r, volatility)
