@@ -20,3 +20,18 @@ class AmericanCallOption(
 
 }
 
+class AmericanPutOption(
+  val underlyingInstrument: Instrument,
+  val strikePrice: BigDecimal,
+  val settlementDate: LocalDate,
+  val expiryDate: LocalDate)
+
+  extends VanillaPutOption with AmericanStyle {
+
+  def isExercisableNow(now: LocalDate): Boolean = {
+    now.isBefore(expiryDate)
+  }
+
+  val settlementStyle = PHYSICAL_SETTLE
+
+}
