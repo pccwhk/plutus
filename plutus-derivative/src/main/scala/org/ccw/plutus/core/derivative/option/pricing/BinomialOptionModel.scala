@@ -5,10 +5,14 @@ import org.ccw.plutus.core.derivative.option.model.VanillaOption
 import org.joda.time.LocalDate
 import scala.collection.mutable.Queue
 import org.joda.time.Days
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object BinomialOptionModel extends OptionPricingModel {
 
-  val TRADING_DAYS_IN_YEAR: Double = 250
+  val logger: Logger = LoggerFactory.getLogger(BinomialOptionModel.getClass())
+
+  val TRADING_DAYS_IN_YEAR: Double = 365
 
   def getImpliedVolatility(option: VanillaOption,
                            currentDate: LocalDate, optionPrice: BigDecimal, underlyingPrice: BigDecimal): BigDecimal = {
@@ -40,8 +44,9 @@ object BinomialOptionModel extends OptionPricingModel {
   }
 
   def getPriceTreeAtNode(q: Queue[Double], depth: Integer) = {
-    val offset = (depth * (depth - 1)) / 2
-    q.drop(offset).take(depth)
+    val d = depth + 1
+    val offset = (d * (d - 1)) / 2
+    q.drop(offset).take(d)
   }
 
   def valueAtPeriodN(p: BigDecimal, u: BigDecimal, d: BigDecimal, s: BigDecimal, n: Int,
@@ -60,37 +65,41 @@ object BinomialOptionModel extends OptionPricingModel {
   }
 
   def getOptionPrice(option: VanillaOption,
-                     currentDate: LocalDate, spotPrice: BigDecimal, r: BigDecimal,
-                     volatility: BigDecimal): BigDecimal = {
+                     currentDate: LocalDate, spotPrice: BigDecimal, interest: BigDecimal,
+                     volatility: BigDecimal, daysPerStep: Integer = 1): BigDecimal = {
 
     if (currentDate.isBefore(option.expiryDate)) {
       // not yet expired, calculate the price
 
       // day count == depth of the tree
-      val depth = Days.daysBetween(currentDate, option.expiryDate).getDays
-      val t = 1 / TRADING_DAYS_IN_YEAR
-      val u = Math.exp(Math.sqrt(t.doubleValue()) * volatility.toDouble)
+      val dayCount = Days.daysBetween(currentDate, option.expiryDate).getDays
+      // t is the number of years per step
+      val t = daysPerStep / TRADING_DAYS_IN_YEAR
+      val depth = dayCount / daysPerStep
+      val u = Math.exp(Math.sqrt(t) * volatility.toDouble)
       val d = 1 / u
+      val r = interest.toDouble
 
-      val p = ((Math.exp((t * r).toDouble)) - d) / (u - d)
+      val probUp = ((Math.exp((t * r))) - d) / (u - d)
+      val probDown = 1 - probUp
 
-      println(s" u = $u, p = $p, d = $d, dayCount = $depth, t = $t, spot = $spotPrice")
+      logger.debug(s" u = $u, p = $probUp, d = $d, dayCount = $dayCount, depth =$depth, t = $t, spot = $spotPrice")
 
       val initQ = Queue[Double]()
       initQ.enqueue(spotPrice.toDouble)
 
-      val priceTree = generatePriceTree(initQ, List[Double](), u, d, 1, depth, true)
+      val priceTree = generatePriceTree(initQ, List[Double](), u, d, 1, depth + 1, true)
 
-      val callValueTree = new Array[BigDecimal](depth)
+      val callValueTree = new Array[BigDecimal](depth + 1)
 
       val stockPriceListAtTerminal = getPriceTreeAtNode(priceTree, depth)
 
-      println("*******STOCK PRICE AT TERMINAL*******")
-      stockPriceListAtTerminal foreach println
-      println("*******STOCK PRICE AT TERMINAL*******")
+      logger.debug("*******STOCK PRICE AT TERMINAL*******")
+      stockPriceListAtTerminal foreach { x => logger.debug(s"$x") }
+      logger.debug("*******CALL VALUE AT TERMINAL*******")
 
       // build the terminal call value
-      for (i <- 0 to depth - 1) {
+      for (i <- 0 to depth) {
         val exerciseValue = stockPriceListAtTerminal(i) - option.strikePrice
         if (exerciseValue > 0) {
           callValueTree(i) = exerciseValue
@@ -98,21 +107,24 @@ object BinomialOptionModel extends OptionPricingModel {
           callValueTree(i) = 0
         }
       }
-      callValueTree foreach println
-      println("***end of teminal call value print")
-      
-      for (n <- depth - 1 to 1 by -1) {
+      callValueTree foreach { x => logger.debug(s"$x") }
+
+      for (n <- depth - 1 to 0 by -1) {
         // start with terminal nodes first 
-        for (i <- 0 to n - 1) {
-          val stockPriceList = getPriceTreeAtNode(priceTree, n)
-          stockPriceList foreach println
-          println("***end of stock price print")
-          val exerciseValue = option.strikePrice - stockPriceListAtTerminal(i)
-          val callValue = (p * callValueTree(i) + (1 - p) * callValueTree(i + 1)) * Math.exp(r.toDouble * t * -1)
-          if (callValue > exerciseValue) {
-            callValueTree(i) = callValue
-          } else {
-            callValueTree(i) = exerciseValue
+        val stockPriceList = getPriceTreeAtNode(priceTree, n)
+        logger.debug(s"***Stock price print at ${n} stage")
+        var i = 0
+        stockPriceList foreach { stockPrice =>
+          {
+            val exerciseValue = stockPrice - option.strikePrice
+            val callValue = (probUp * callValueTree(i) + probDown * callValueTree(i + 1)) * Math.exp(r.toDouble * t * -1)
+            logger.debug(s">>>>> stockPrice at  $stockPrice, Call Value = $callValue, exercise = $exerciseValue at $n stage, node $i")
+            if (callValue > exerciseValue) {
+              callValueTree(i) = callValue
+            } else {
+              callValueTree(i) = exerciseValue
+            }
+            i = i + 1
           }
         }
       }
