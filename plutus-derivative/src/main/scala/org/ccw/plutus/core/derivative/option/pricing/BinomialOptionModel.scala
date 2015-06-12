@@ -49,95 +49,155 @@ object BinomialOptionModel extends OptionPricingModel {
     q.drop(offset).take(d)
   }
 
-  def valueAtPeriodN(p: BigDecimal, u: BigDecimal, d: BigDecimal, s: BigDecimal, n: Int,
-                     strikePrice: BigDecimal, r: Double, deltaT: Double): BigDecimal = {
-    if (n == 0) {
-      val callValue = strikePrice - s
-      if (callValue > 0) {
-        callValue
-      } else {
-        0
-      }
-
-    } else {
-      Math.exp(-r * deltaT) * (p * valueAtPeriodN(p, u, d, s * u, n - 1, strikePrice, r, deltaT) + (1 - p) * valueAtPeriodN(p, u, d, s * d, n - 1, strikePrice, r, deltaT))
-    }
-  }
-
-  def getOptionPrice(option: VanillaOption,
-                     currentDate: LocalDate, spotPrice: BigDecimal, interest: BigDecimal,
-                     volatility: BigDecimal, daysPerStep: Integer = 1): BigDecimal = {
-
+  def getPutPrice(option: VanillaOption,
+                  currentDate: LocalDate, spotPrice: Double, interest: Double,
+                  volatility: Double, noOfSteps: Integer = 100): Double = {
     if (currentDate.isBefore(option.expiryDate)) {
-      // not yet expired, calculate the price
 
-      // day count == depth of the tree
       val dayCount = Days.daysBetween(currentDate, option.expiryDate).getDays
-      // t is the number of years per step
-      val t = daysPerStep / TRADING_DAYS_IN_YEAR
-      val depth = dayCount / daysPerStep
+      val t = (dayCount / noOfSteps.toDouble) / TRADING_DAYS_IN_YEAR
       val u = Math.exp(Math.sqrt(t) * volatility.toDouble)
       val d = 1 / u
-      val r = interest.toDouble
+      val r = interest
 
       val probUp = ((Math.exp((t * r))) - d) / (u - d)
       val probDown = 1 - probUp
 
-      logger.debug(s" u = $u, p = $probUp, d = $d, dayCount = $dayCount, depth =$depth, t = $t, spot = $spotPrice")
+      //logger.debug(s" u = $u, p = $probUp, d = $d, dayCount = $dayCount, steps  = $noOfSteps, t = $t, spot = $spotPrice")
 
       val initQ = Queue[Double]()
       initQ.enqueue(spotPrice.toDouble)
 
-      val priceTree = generatePriceTree(initQ, List[Double](), u, d, 1, depth + 1, true)
+      val priceTree = generatePriceTree(initQ, List[Double](), u, d, 1, noOfSteps + 1, true)
 
-      val callValueTree = new Array[BigDecimal](depth + 1)
+      val putValueTree = new Array[Double](noOfSteps + 1)
 
-      val stockPriceListAtTerminal = getPriceTreeAtNode(priceTree, depth)
+      val stockPriceListAtTerminal = getPriceTreeAtNode(priceTree, noOfSteps)
 
-      logger.debug("*******STOCK PRICE AT TERMINAL*******")
-      stockPriceListAtTerminal foreach { x => logger.debug(s"$x") }
-      logger.debug("*******CALL VALUE AT TERMINAL*******")
+      //logger.debug("*******STOCK PRICE AT TERMINAL*******")
+      //stockPriceListAtTerminal foreach { x => logger.debug(s"$x") }
+      //logger.debug("*******CALL VALUE AT TERMINAL*******")
 
       // build the terminal call value
-      for (i <- 0 to depth) {
-        val exerciseValue = stockPriceListAtTerminal(i) - option.strikePrice
+      for (i <- 0 to noOfSteps) {
+        val exerciseValue = option.strikePrice - stockPriceListAtTerminal(i)
         if (exerciseValue > 0) {
-          callValueTree(i) = exerciseValue
+          putValueTree(i) = exerciseValue.toDouble
         } else {
-          callValueTree(i) = 0
+          putValueTree(i) = 0
         }
       }
-      callValueTree foreach { x => logger.debug(s"$x") }
+      //callValueTree foreach { x => logger.debug(s"$x") }
 
-      for (n <- depth - 1 to 0 by -1) {
+      for (n <- noOfSteps - 1 to 0 by -1) {
         // start with terminal nodes first 
         val stockPriceList = getPriceTreeAtNode(priceTree, n)
-        logger.debug(s"***Stock price print at ${n} stage")
+        //logger.debug(s"***Stock price print at ${n} stage")
         var i = 0
         stockPriceList foreach { stockPrice =>
           {
-            val exerciseValue = stockPrice - option.strikePrice
-            val callValue = (probUp * callValueTree(i) + probDown * callValueTree(i + 1)) * Math.exp(r.toDouble * t * -1)
-            logger.debug(s">>>>> stockPrice at  $stockPrice, Call Value = $callValue, exercise = $exerciseValue at $n stage, node $i")
-            if (callValue > exerciseValue) {
-              callValueTree(i) = callValue
+            val exerciseValue = option.strikePrice - stockPrice
+            val putValue = (probUp * putValueTree(i) + probDown * putValueTree(i + 1)) * Math.exp(r * t * -1)
+            //logger.debug(s">>>>> stockPrice at  $stockPrice, Call Value = $callValue, exercise = $exerciseValue at $n stage, node $i")
+            if (putValue > exerciseValue) {
+              putValueTree(i) = putValue
             } else {
-              callValueTree(i) = exerciseValue
+              putValueTree(i) = exerciseValue.toDouble
             }
             i = i + 1
           }
         }
       }
+      println(putValueTree(0))
+      putValueTree(0)
 
-      callValueTree(0)
     } else if (currentDate.isEqual(option.expiryDate)) {
-
-      option.payOffOnExpiry(spotPrice)
+      option.payOffOnExpiry(spotPrice).toDouble
     } else {
       // expired 
-      BigDecimal("0")
+      0
     }
 
+  }
+
+  def getCallPrice(option: VanillaOption,
+                   currentDate: LocalDate, spotPrice: Double, interest: Double,
+                   volatility: Double, noOfSteps: Integer = 100): Double = {
+    if (currentDate.isBefore(option.expiryDate)) {
+
+      val dayCount = Days.daysBetween(currentDate, option.expiryDate).getDays
+      val t = (dayCount / noOfSteps.toDouble) / TRADING_DAYS_IN_YEAR
+      val u = Math.exp(Math.sqrt(t) * volatility.toDouble)
+      val d = 1 / u
+      val r = interest
+
+      val probUp = ((Math.exp((t * r))) - d) / (u - d)
+      val probDown = 1 - probUp
+
+      //logger.debug(s" u = $u, p = $probUp, d = $d, dayCount = $dayCount, steps  = $noOfSteps, t = $t, spot = $spotPrice")
+
+      val initQ = Queue[Double]()
+      initQ.enqueue(spotPrice.toDouble)
+
+      val priceTree = generatePriceTree(initQ, List[Double](), u, d, 1, noOfSteps + 1, true)
+
+      val callValueTree = new Array[Double](noOfSteps + 1)
+
+      val stockPriceListAtTerminal = getPriceTreeAtNode(priceTree, noOfSteps)
+
+      //logger.debug("*******STOCK PRICE AT TERMINAL*******")
+      //stockPriceListAtTerminal foreach { x => logger.debug(s"$x") }
+      //logger.debug("*******CALL VALUE AT TERMINAL*******")
+
+      // build the terminal call value
+      for (i <- 0 to noOfSteps) {
+        val exerciseValue = stockPriceListAtTerminal(i) - option.strikePrice
+        if (exerciseValue > 0) {
+          callValueTree(i) = exerciseValue.toDouble
+        } else {
+          callValueTree(i) = 0
+        }
+      }
+      //callValueTree foreach { x => logger.debug(s"$x") }
+
+      for (n <- noOfSteps - 1 to 0 by -1) {
+        // start with terminal nodes first 
+        val stockPriceList = getPriceTreeAtNode(priceTree, n)
+        //logger.debug(s"***Stock price print at ${n} stage")
+        var i = 0
+        stockPriceList foreach { stockPrice =>
+          {
+            val exerciseValue = stockPrice - option.strikePrice
+            val callValue = (probUp * callValueTree(i) + probDown * callValueTree(i + 1)) * Math.exp(r * t * -1)
+            //logger.debug(s">>>>> stockPrice at  $stockPrice, Call Value = $callValue, exercise = $exerciseValue at $n stage, node $i")
+            if (callValue > exerciseValue) {
+              callValueTree(i) = callValue
+            } else {
+              callValueTree(i) = exerciseValue.toDouble
+            }
+            i = i + 1
+          }
+        }
+      }
+      println(callValueTree(0))
+      callValueTree(0)
+    } else if (currentDate.isEqual(option.expiryDate)) {
+      option.payOffOnExpiry(spotPrice).toDouble
+    } else {
+      // expired 
+      0
+    }
+  }
+
+  def getOptionPrice(option: VanillaOption,
+                     currentDate: LocalDate, spotPrice: BigDecimal, interest: BigDecimal,
+                     volatility: BigDecimal): BigDecimal = {
+
+    if (option.isCall) {
+      BigDecimal(getCallPrice(option, currentDate, spotPrice.toDouble, interest.toDouble, volatility.toDouble, 500))
+    } else {
+      BigDecimal(getPutPrice(option, currentDate, spotPrice.toDouble, interest.toDouble, volatility.toDouble, 500))
+    }
   }
 
 }
