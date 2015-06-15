@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import scala.io.Source
 import org.xml.sax.InputSource
 import scala.xml._
-import parsing._
+import scala.xml.parsing._
 
 class HTML5Parser extends NoBindingFactoryAdapter {
 

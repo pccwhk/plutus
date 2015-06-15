@@ -82,7 +82,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
               val (month, year) = CMEFutures.getMonthFromCodes(monthYearCode)
               val lastPrice = (node \ "strong").text
               if (!lastPrice.equals("-")) {
-                println(s"price is $lastPrice for $month, $year, $localId")
+                info(s"price is $lastPrice for $month, $year, $localId")
               }
             }
           }
