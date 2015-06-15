@@ -21,6 +21,8 @@ subprojects {
 	    compile 'ch.qos.logback:logback-classic:1.0.13'
 	    compile 'joda-time:joda-time:2.3'
 	    compile 'org.joda:joda-convert:1.2'
+	    compile 'nu.validator.htmlparser:htmlparser:1.4'
+	
 	    
 	    testCompile 'com.h2database:h2:1.4.185'
 	    testCompile "org.scala-lang:scala-library:2.11.5"
@@ -50,6 +52,7 @@ project(':plutus-derivative') {
         compile project(':plutus-core')
     }
 }
+
 
 
 
