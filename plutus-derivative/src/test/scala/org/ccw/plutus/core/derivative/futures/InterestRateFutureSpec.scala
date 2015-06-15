@@ -20,28 +20,9 @@ import scala.collection.mutable.Queue
 import org.xml.sax.InputSource
 import scala.xml._
 import parsing._
-
-
+import org.scalatest.Assertions._
+import org.ccw.plutus.core.web.HTML5Parser
 object InterestRateFutureSpec
-
-class HTML5Parser extends NoBindingFactoryAdapter {
-
-  override def loadXML(source: InputSource, _p: SAXParser) = {
-    loadXML(source)
-  }
-
-  def loadXML(source: InputSource) = {
-    import nu.validator.htmlparser.{ sax, common }
-    import sax.HtmlParser
-    import common.XmlViolationPolicy
-
-    val reader = new HtmlParser
-    reader.setXmlPolicy(XmlViolationPolicy.ALLOW)
-    reader.setContentHandler(this)
-    reader.parse(source)
-    rootElem
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
 class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
@@ -55,9 +36,31 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
 
   }
 
+  "Futures Date Convertor " should " process date to next decade" in {
+    val year2019 = new LocalDate(2019, 1, 31)
+
+    val (month, year) = CMEFutures.getMonthFromCodes("G5", year2019)
+
+    assert(year == 2025 && month == 2, s"Futures Date Convertor is not correctly converting G5 to 2025-01 in $year2019, wrong value is [$year-$month]")
+  }
+
+  "Futures Date Convertor " should " process date to same decade" in {
+
+    val year2010 = new LocalDate(2010, 12, 31)
+
+    val (month, year) = CMEFutures.getMonthFromCodes("Z5", year2010)
+
+    assert(year == 2015 && month == 12, s"Futures Date Convertor is not correctly converting Z5 to 2015-12 in $year2010, wrong value is [$year-$month]")
+
+  }
+
+  it should " handle exception properly for invalid month code" in {
+    intercept[Exception] {
+      val (month, year) = CMEFutures.getMonthFromCodes("A5")
+    }
+  }
+
   "reading file from CME " should " work " in {
-
-
 
     val source1 = new org.xml.sax.InputSource(futuresUrl)
     val parser = new HTML5Parser
@@ -73,9 +76,9 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
           IdSeq foreach { idNode =>
             val localId = idNode.text.trim
             if (localId.contains("_ZQ") && localId.contains("last")) {
-              val start = localId.indexOf("_ZQ") +3
+              val start = localId.indexOf("_ZQ") + 3
               val end = start + 2
-              val monthYearCode = localId.substring(start , end)
+              val monthYearCode = localId.substring(start, end)
               val (month, year) = CMEFutures.getMonthFromCodes(monthYearCode)
               val lastPrice = (node \ "strong").text
               if (!lastPrice.equals("-")) {
