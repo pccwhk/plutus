@@ -1,7 +1,7 @@
 package org.ccw.plutus.core.derivative.option.model
 
 import org.ccw.plutus.core.model.base.Instrument
-import org.ccw.plutus.core.derivative.option.model.SettlementStyle._
+import org.ccw.plutus.core.derivative.SettlementStyle._
 import org.joda.time.LocalDate
 
 class AmericanCallOption(

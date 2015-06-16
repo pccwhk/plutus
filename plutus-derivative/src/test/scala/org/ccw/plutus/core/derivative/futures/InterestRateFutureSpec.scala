@@ -29,11 +29,13 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
 
   val logger: Logger = LoggerFactory.getLogger(InterestRateFutureSpec.getClass())
 
-  var futuresUrl = ""
+  var interestRateFuturesUrl = ""
+  var euroDollarFuturesUrl = ""
+  val today = new LocalDate
 
   before {
-    futuresUrl = "http://www.cmegroup.com/trading/interest-rates/stir/30-day-federal-fund.html?optionExpiration=N5"
-
+    interestRateFuturesUrl = "http://www.cmegroup.com/trading/interest-rates/stir/30-day-federal-fund.html"
+    euroDollarFuturesUrl = "http://www.cmegroup.com/trading/interest-rates/stir/eurodollar.html"
   }
 
   "Futures Date Convertor " should " process date to next decade" in {
@@ -56,38 +58,20 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
 
   it should " handle exception properly for invalid month code" in {
     intercept[Exception] {
-      val (month, year) = CMEFutures.getMonthFromCodes("A5")
+      val (month, year) = CMEFutures.getMonthFromCodes("A5", today)
     }
   }
 
-  "reading file from CME " should " work " in {
+  it should " get last price for Interest Rate Product - ZQ " in {
+    CMEFutures.getFuturePrice(interestRateFuturesUrl, "ZQ", today)
+  }
 
-    val source1 = new org.xml.sax.InputSource(futuresUrl)
-    val parser = new HTML5Parser
+  it should " get last price for EURODOLLER - GU " in {
+    CMEFutures.getFuturePrice(euroDollarFuturesUrl, "GU", today)
+  }
 
-    val test = parser.loadXML(source1)
-
-    println("--------------")
-    val tdNode = (test \\ "td")
-    tdNode.toSeq foreach {
-      node =>
-        {
-          val IdSeq = (node \ "@id").toSeq
-          IdSeq foreach { idNode =>
-            val localId = idNode.text.trim
-            if (localId.contains("_ZQ") && localId.contains("last")) {
-              val start = localId.indexOf("_ZQ") + 3
-              val end = start + 2
-              val monthYearCode = localId.substring(start, end)
-              val (month, year) = CMEFutures.getMonthFromCodes(monthYearCode)
-              val lastPrice = (node \ "strong").text
-              if (!lastPrice.equals("-")) {
-                info(s"price is $lastPrice for $month, $year, $localId")
-              }
-            }
-          }
-        }
-    }
+  it should " calculate the rate rise probability" in {
+    CMEFutures.getFuturePrice(euroDollarFuturesUrl, "ZQ", today)
   }
 
 }

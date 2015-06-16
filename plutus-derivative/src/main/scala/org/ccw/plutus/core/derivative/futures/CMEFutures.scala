@@ -2,14 +2,18 @@ package org.ccw.plutus.core.derivative.futures
 
 import org.joda.time.LocalDate
 import org.ccw.plutus.core.util.StringUtil
+import org.ccw.plutus.core.web.HTML5Parser
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object CMEFutures {
-  val today = new LocalDate
+
+  val logger: Logger = LoggerFactory.getLogger(CMEFutures.getClass())
 
   val MONTH_CODES = List[String](
     "F", "G", "H", "J", "K", "M", "N", "Q", "U", "V", "X", "Z")
 
-  def getMonthFromCodes(stringCode: String, currentDate: LocalDate = today): (Integer, Integer) = {
+  def getMonthFromCodes(stringCode: String, currentDate: LocalDate): (Integer, Integer) = {
     val code = stringCode.trim
     if (code.length() != 2) {
       throw new Exception(s"Invalid Month Code - $code")
@@ -34,7 +38,7 @@ object CMEFutures {
               val r = currentYear % 10
 
               if (r == 9 && year != 9) {
-                (monthData,  (q + 1)* 10 + year)
+                (monthData, (q + 1) * 10 + year)
               } else {
                 (monthData, (q * 10 + year))
               }
@@ -50,4 +54,32 @@ object CMEFutures {
       }
     }
   }
+
+  def getFuturePrice(futuresUrl: String, productCode: String, currentDate :LocalDate) = {
+    val source1 = new org.xml.sax.InputSource(futuresUrl)
+    val parser = new HTML5Parser
+    val xmlNode = parser.loadXML(source1)
+    val tdNode = (xmlNode \\ "td")
+    val productKeyString = s"_$productCode"
+    tdNode.toSeq foreach {
+      node =>
+        {
+          val IdSeq = (node \ "@id").toSeq
+          IdSeq foreach { idNode =>
+            val localId = idNode.text.trim
+            if (localId.contains(productKeyString) && localId.contains("last")) {
+              val start = localId.indexOf(productKeyString) + 3
+              val end = start + 2
+              val monthYearCode = localId.substring(start, end)
+              val (month, year) = CMEFutures.getMonthFromCodes(monthYearCode, currentDate)
+              val lastPrice = (node \ "strong").text
+              if (!lastPrice.equals("-")) {
+                logger.info(s"$productCode - last price is $lastPrice for $month, $year, $localId")
+              }
+            }
+          }
+        }
+    }
+  }
+
 }
