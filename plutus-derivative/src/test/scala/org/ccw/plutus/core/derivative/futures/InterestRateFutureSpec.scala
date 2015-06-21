@@ -3,9 +3,6 @@ package org.ccw.plutus.core.derivative.futures
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.ccw.plutus.core.derivative.option.model.AmericanCallOption
-import org.ccw.plutus.core.derivative.option.model.AmericanPutOption
-import org.ccw.plutus.core.derivative.option.pricing.BinomialOptionModel
 import org.joda.time.LocalDate
 import org.scalatest.BeforeAndAfter
 import org.slf4j.Logger
@@ -18,14 +15,16 @@ import java.net.Proxy
 import java.net.InetSocketAddress
 import scala.collection.mutable.Queue
 import org.xml.sax.InputSource
-import scala.xml._
-import parsing._
 import org.scalatest.Assertions._
 import org.ccw.plutus.core.web.HTML5Parser
+//import org.ccw.plutus.core.derivative.futures.InterestRateFuture
+
 object InterestRateFutureSpec
 
 @RunWith(classOf[JUnitRunner])
 class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
+
+
 
   val logger: Logger = LoggerFactory.getLogger(InterestRateFutureSpec.getClass())
 
@@ -46,7 +45,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
     assert(year == 2025 && month == 2, s"Futures Date Convertor is not correctly converting G5 to 2025-01 in $year2019, wrong value is [$year-$month]")
   }
 
-  "Futures Date Convertor " should " process date to same decade" in {
+  it should " process date to same decade" in {
 
     val year2010 = new LocalDate(2010, 12, 31)
 
@@ -62,7 +61,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
     }
   }
 
-  it should " get last price for Interest Rate Product - ZQ " in {
+  "CME Futures " should " get last price for Interest Rate Product - ZQ " in {
     CMEFutures.getFuturePrice(interestRateFuturesUrl, "ZQ", today)
   }
 
@@ -70,8 +69,13 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
     CMEFutures.getFuturePrice(euroDollarFuturesUrl, "GU", today)
   }
 
-  it should " calculate the rate rise probability" in {
-    CMEFutures.getFuturePrice(euroDollarFuturesUrl, "ZQ", today)
+  "InterestRateFuture probability " should " calculate the rate rise probability" in {
+    val r = CMEFutures.getFuturePrice(euroDollarFuturesUrl, "ZQ", today)
+    r foreach {
+      case (year, month, p) =>{
+        InterestRateFuture.impliedProbabilityFromFuturesPrice(p.toDouble, 0.25, new LocalDate)
+      }
+    }
   }
 
 }

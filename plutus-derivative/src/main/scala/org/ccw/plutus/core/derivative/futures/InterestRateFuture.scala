@@ -1,8 +1,12 @@
 package org.ccw.plutus.core.derivative.futures
 
 import org.joda.time.LocalDate
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-trait InterestRateFuture {
+object InterestRateFuture {
+  
+    val logger: Logger = LoggerFactory.getLogger(InterestRateFuture.getClass())
 
   val rateInterval = 0.25
 
@@ -15,7 +19,7 @@ trait InterestRateFuture {
       if (differential < 0) {
 
       } else if (differential > 0) {
-          println(s"probability for $rateRise = " + differential / rateRise )
+          logger.info(s"probability for $rateRise = " + differential / rateRise )
       } else {
         // no change 
       }

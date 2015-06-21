@@ -55,31 +55,31 @@ object CMEFutures {
     }
   }
 
-  def getFuturePrice(futuresUrl: String, productCode: String, currentDate :LocalDate) = {
+  def getFuturePrice(futuresUrl: String, productCode: String, currentDate: LocalDate) = {
     val source1 = new org.xml.sax.InputSource(futuresUrl)
     val parser = new HTML5Parser
     val xmlNode = parser.loadXML(source1)
     val tdNode = (xmlNode \\ "td")
     val productKeyString = s"_$productCode"
-    tdNode.toSeq foreach {
-      node =>
-        {
-          val IdSeq = (node \ "@id").toSeq
-          IdSeq foreach { idNode =>
-            val localId = idNode.text.trim
-            if (localId.contains(productKeyString) && localId.contains("last")) {
-              val start = localId.indexOf(productKeyString) + 3
-              val end = start + 2
-              val monthYearCode = localId.substring(start, end)
-              val (month, year) = CMEFutures.getMonthFromCodes(monthYearCode, currentDate)
-              val lastPrice = (node \ "strong").text
-              if (!lastPrice.equals("-")) {
-                logger.info(s"$productCode - last price is $lastPrice for $month, $year, $localId")
-              }
-            }
-          }
-        }
-    }
+
+    val list = for {
+      node <- tdNode.toSeq
+      IdSeq <- (node \ "@id").toSeq
+      l <- for {
+        idNode <- IdSeq
+        localId = idNode.text.trim
+        if (localId.contains(productKeyString) && localId.contains("last"))
+        start = localId.indexOf(productKeyString) + 3
+        end = start + 2
+        monthYearCode = localId.substring(start, end)
+        (month, year) = CMEFutures.getMonthFromCodes(monthYearCode, currentDate)
+        lastPrice = (node \ "strong").text
+        if (!lastPrice.equals("-"))
+        if (StringUtil.isNumberic(lastPrice)._1)
+        //  logger.info(s"$productCode - last price is $lastPrice for $month, $year, $localId")
+      } yield ((year, month, BigDecimal(lastPrice)))
+    } yield (l)
+    list
   }
 
 }
