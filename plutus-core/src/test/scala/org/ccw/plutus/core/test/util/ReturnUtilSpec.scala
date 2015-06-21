@@ -11,6 +11,7 @@ import org.ccw.plutus.core.util.StringUtil
 import org.ccw.plutus.core.util.ReturnUtil
 import org.joda.time.LocalDate
 import org.joda.time.Days
+import org.scalatest.Assertions._
 
 @RunWith(classOf[JUnitRunner])
 class ReturnUtilSpec extends FlatSpec {
@@ -38,8 +39,23 @@ class ReturnUtilSpec extends FlatSpec {
     assertResult(1.2) {
       r(0)
     }
-    assertResult(1) {
-      r.size
-    }
+    assertResult(prices.size - 1) { r.size }
   }
+
+  it should " return bulk item list for multiple  prices" in {
+    val prices: List[BigDecimal] = List[BigDecimal](100, 120, 130, 100)
+    val r = ReturnUtil.getCumulativeReturn(prices)
+    r foreach println
+    assertResult(prices.size -1) { r.size }
+
+  }
+
+  it should " return one item list for multiple  prices" in {
+    val prices: List[BigDecimal] = List[BigDecimal](100, 100)
+    val r = ReturnUtil.getCumulativeReturn(prices)
+    assertResult(prices.size - 1) { r.size }
+    assertResult(1) { r(0) }
+
+  }
+
 }

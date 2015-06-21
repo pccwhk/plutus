@@ -17,11 +17,12 @@ object InterestRateFuture {
       val rateRise = i * rateInterval
       val differential = interestRateImplied - currentRate
       if (differential < 0) {
-
+        logger.info("differential is -ve")
       } else if (differential > 0) {
           logger.info(s"probability for $rateRise = " + differential / rateRise )
       } else {
-        // no change 
+        // no change
+        logger.info("differential is no change")
       }
     }
 

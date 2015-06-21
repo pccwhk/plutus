@@ -8,6 +8,7 @@ import org.ccw.plutus.core.model.equities.Stock
 import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.util.DateUtil
 import org.ccw.plutus.core.util.StringUtil
+import org.ccw.plutus.core.util.ReturnUtil
 import org.joda.time.LocalDate
 import org.joda.time.Days
 
@@ -49,15 +50,14 @@ class UtilSpec extends FlatSpec {
       r
     }
   }
-  
+
   "mask " should " work " in {
     val i = 5
-    val q = 2019 / 10 
-    val r = 2019 % 10 
+    val q = 2019 / 10
+    val r = 2019 % 10
     if (r == 9) {
       println((q + 1) * 10 + i)
-    }
-    else {
+    } else {
       println((q) * 10 + i)
     }
   }
