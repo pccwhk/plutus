@@ -3,8 +3,4 @@ dependencies {
     compile project(':plutus-core')
 }
 
-archivesBaseName = 'plutus-derivative'
-
-
-
-
+archivesBaseName = 'plutus-ext'

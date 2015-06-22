@@ -1,1 +1,1 @@
-include 'plutus-core', 'plutus-derivative'
+include ':plutus-core', ':plutus-derivative', ':plutus-ext'

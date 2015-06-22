@@ -1,3 +1,8 @@
+allprojects {
+  task hello << { task -> println "I'm $task.project.name" }
+}
+
+
 subprojects {
 
 	apply plugin: 'scala'
@@ -43,14 +48,6 @@ subprojects {
 
 	task doAll(dependsOn: [clean, copyToLib]) 
 
-}
-
-
-
-project(':plutus-derivative') {
-    dependencies {
-        compile project(':plutus-core')
-    }
 }
 
 
