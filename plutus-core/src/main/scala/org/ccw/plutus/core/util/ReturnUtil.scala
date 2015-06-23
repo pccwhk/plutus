@@ -15,6 +15,11 @@ object ReturnUtil {
     }
   }
 
+  def getTotalReturn(prices: List[BigDecimal]) :BigDecimal= {
+    // we can use reduce here because multiplication is distributive and associative
+    getCumulativeReturn(prices).reduce(_ * _)
+  }
+
   private def cumulativeReturn(first: BigDecimal, prices: List[BigDecimal], result: List[BigDecimal]): List[BigDecimal] = {
     if (prices.isEmpty) result.reverse
     else {

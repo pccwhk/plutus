@@ -55,7 +55,12 @@ class ReturnUtilSpec extends FlatSpec {
     val r = ReturnUtil.getCumulativeReturn(prices)
     assertResult(prices.size - 1) { r.size }
     assertResult(1) { r(0) }
-
+  }
+  
+  it should " generate correct total return" in {
+    val prices: List[BigDecimal] = List[BigDecimal](100, 120, 130, 100)
+    val r = ReturnUtil.getTotalReturn(prices)
+    assertResult(1.0) { r }
   }
 
 }
