@@ -18,7 +18,7 @@ class Dividend2 (
 }*/
 
 object Dividends extends TableQuery(new Dividend(_)) {
-  val findByName = this.findBy(_.instrumentCode)
+  val findByInstrumentCode = this.findBy(_.instrumentCode)
 }
 
 class Dividend(tag: Tag) extends Table[(Int, String, java.sql.Date, java.sql.Date, java.sql.Date, BigDecimal)](tag, "dividend") {
