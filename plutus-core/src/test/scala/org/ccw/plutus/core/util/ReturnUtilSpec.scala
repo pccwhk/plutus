@@ -1,4 +1,4 @@
-package org.ccw.plutus.core.test.util
+package org.ccw.plutus.core.util
 
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
@@ -6,9 +6,6 @@ import org.scalatest.junit.JUnitRunner
 import java.util.Date
 import org.ccw.plutus.core.model.equities.Stock
 import org.ccw.plutus.core.model.equities.EquityType._
-import org.ccw.plutus.core.util.DateUtil
-import org.ccw.plutus.core.util.StringUtil
-import org.ccw.plutus.core.util.ReturnUtil
 import org.scalatest.Assertions._
 
 @RunWith(classOf[JUnitRunner])

@@ -7,16 +7,6 @@ import slick.lifted.{ ProvenShape, ForeignKeyQuery }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-/*
-class Dividend2 (
-    equity :Stock,
-	exdividendDate :Date,
-	recordDate :Date,
-	paymentDate :Date,
-	dividendAmount :BigDecimal) {
-	
-}*/
-
 object Dividends extends TableQuery(new Dividend(_)) {
   val findByInstrumentCode = this.findBy(_.instrumentCode)
 }

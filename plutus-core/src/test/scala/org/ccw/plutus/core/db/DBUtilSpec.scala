@@ -1,11 +1,11 @@
-package org.ccw.plutus.core.test.db
+package org.ccw.plutus.core.db
 
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.ccw.plutus.core.db.adapter.HikariAdapter
 import org.ccw.plutus.core.db.adapter.BonecpAdapter
-import org.ccw.plutus.core.db.DBUtil
+
 
 @RunWith(classOf[JUnitRunner])
 class DBUtilSpec extends FlatSpec {

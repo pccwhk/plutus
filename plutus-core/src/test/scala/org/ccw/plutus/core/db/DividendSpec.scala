@@ -1,11 +1,11 @@
-package org.ccw.plutus.core.test.db
+package org.ccw.plutus.core.db
 
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.ccw.plutus.core.db.adapter.HikariAdapter
 import org.ccw.plutus.core.db.adapter.BonecpAdapter
-import org.ccw.plutus.core.db.DBUtil
+
 
 import slick.dbio.DBIO
 import slick.driver.H2Driver.api._
@@ -37,7 +37,7 @@ class DividendSpec extends FlatSpec {
     future.onSuccess { case x => x foreach (println) }
     future.onComplete {case y =>  println ("i am done") }
     
-    Thread.sleep(100000)
+    Thread.sleep(100)
 
   }
 }
