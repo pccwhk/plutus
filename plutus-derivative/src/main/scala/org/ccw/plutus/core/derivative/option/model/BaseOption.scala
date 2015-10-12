@@ -1,6 +1,6 @@
 package org.ccw.plutus.core.derivative.option.model
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.ccw.plutus.core.model.base.Instrument
 import org.ccw.plutus.core.derivative.SettlementStyle._;
 

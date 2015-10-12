@@ -2,9 +2,9 @@ package org.ccw.plutus.core.derivative.option.pricing
 
 import java.util.Date
 import org.ccw.plutus.core.derivative.option.model.VanillaOption
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import scala.collection.mutable.Queue
-import org.joda.time.Days
+import java.time.Period
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -54,7 +54,7 @@ object BinomialOptionModel extends OptionPricingModel {
                   volatility: Double, noOfSteps: Integer = 100): Double = {
     if (currentDate.isBefore(option.expiryDate)) {
 
-      val dayCount = Days.daysBetween(currentDate, option.expiryDate).getDays
+      val dayCount = Period.between(currentDate, option.expiryDate).getDays
       val t = (dayCount / noOfSteps.toDouble) / TRADING_DAYS_IN_YEAR
       val u = Math.exp(Math.sqrt(t) * volatility.toDouble)
       val d = 1 / u
@@ -125,7 +125,7 @@ object BinomialOptionModel extends OptionPricingModel {
                    volatility: Double, noOfSteps: Integer = 100): Double = {
     if (currentDate.isBefore(option.expiryDate)) {
 
-      val dayCount = Days.daysBetween(currentDate, option.expiryDate).getDays
+      val dayCount = Period.between(currentDate, option.expiryDate).getDays
       val t = (dayCount / noOfSteps.toDouble) / TRADING_DAYS_IN_YEAR
       val u = Math.exp(Math.sqrt(t) * volatility.toDouble)
       val d = 1 / u

@@ -9,8 +9,6 @@ import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.util.DateUtil
 import org.ccw.plutus.core.util.StringUtil
 import org.ccw.plutus.core.util.ReturnUtil
-import org.joda.time.LocalDate
-import org.joda.time.Days
 import org.scalatest.Assertions._
 
 @RunWith(classOf[JUnitRunner])

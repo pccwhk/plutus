@@ -8,7 +8,7 @@ import org.ccw.plutus.core.derivative.option.model.AmericanPutOption
 import org.ccw.plutus.core.model.equities.Stock
 import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.derivative.option.pricing.BinomialOptionModel
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.scalatest.BeforeAndAfter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,8 +33,8 @@ class AmericanOptionSpec extends FlatSpec with BeforeAndAfter {
 
   before {
     stock = new Stock(1, "0005", "HSBC", "HKEX")
-    expiryDate = new LocalDate(2014, 1, 31)
-    settlementDate = new LocalDate(2014, 1, 31)
+    expiryDate = LocalDate.of(2014, 1, 31)
+    settlementDate = LocalDate.of(2014, 1, 31)
     spotPrice = BigDecimal("45")
     callStrikePrice = BigDecimal("45")
     putStrikePrice = BigDecimal("45")

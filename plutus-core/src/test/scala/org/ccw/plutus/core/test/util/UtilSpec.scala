@@ -9,28 +9,29 @@ import org.ccw.plutus.core.model.equities.EquityType._
 import org.ccw.plutus.core.util.DateUtil
 import org.ccw.plutus.core.util.StringUtil
 import org.ccw.plutus.core.util.ReturnUtil
-import org.joda.time.LocalDate
-import org.joda.time.Days
+import java.time.LocalDate
+import java.time.Period
+import java.time.temporal.ChronoUnit
 
 @RunWith(classOf[JUnitRunner])
 class UtilSpec extends FlatSpec {
 
   "Date Util " should " count the days correctly for one day" in {
 
-    val localDate1 = new LocalDate(2005, 3, 26);
-    val localDate2 = new LocalDate(2005, 3, 27);
-    assertResult(Days.ONE) {
-      Days.daysBetween(localDate1, localDate2)
+    val localDate1 = LocalDate.of(2005, 3, 26);
+    val localDate2 = LocalDate.of(2005, 3, 27);
+    assertResult(1) {
+      Period.between(localDate1, localDate2).getDays
     }
 
   }
 
   "Date Util " should " count the days correctly for 4 days" in {
 
-    val localDate1 = new LocalDate(2005, 3, 26);
-    val localDate2 = new LocalDate(2005, 3, 30);
-    assertResult(Days.FOUR) {
-      Days.daysBetween(localDate1, localDate2)
+    val localDate1 = LocalDate.of(2005, 3, 26);
+    val localDate2 = LocalDate.of(2005, 3, 30);
+    assertResult(4) {
+      Period.between(localDate1, localDate2).getDays
     }
 
   }

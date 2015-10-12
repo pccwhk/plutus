@@ -1,6 +1,6 @@
 package org.ccw.plutus.core.model.equities
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 
 object TradeSide extends Enumeration {

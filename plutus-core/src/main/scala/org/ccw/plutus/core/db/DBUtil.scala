@@ -62,6 +62,8 @@ class DBUtil(dbAdapter :DBAdapter) {
         try {
           c.get.close
           logger.debug(s"Release connection by ${Thread.currentThread()} successfully")
+        } finally {
+          logger.debug(s"Fail to release connection by ${Thread.currentThread()}")
         }
       }
     }

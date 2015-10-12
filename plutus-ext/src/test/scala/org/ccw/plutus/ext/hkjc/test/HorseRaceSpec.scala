@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfter
 import org.ccw.plutus.core.web.HTML5Parser
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import scala.collection.mutable.HashMap
 import org.scalatest.junit.JUnitRunner
 
@@ -19,7 +19,7 @@ class HorseRaceSpec extends FlatSpec with BeforeAndAfter {
   it should "parse the winning bet" in {
     val venue = "HV"
     val sb = new StringBuilder(url)
-    sb.append("date=").append(new LocalDate().toString("dd-MM-yyyy")).append("&venue=").append(venue)
+    sb.append("date=").append(LocalDate.now().toString).append("&venue=").append(venue)
     sb.append("&raceno=7").append("&cur=").append("220")
 
     var map = new HashMap[String, Array[String]]()

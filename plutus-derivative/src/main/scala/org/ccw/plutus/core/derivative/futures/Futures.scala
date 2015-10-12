@@ -2,7 +2,7 @@ package org.ccw.plutus.core.derivative.futures
 
 import org.ccw.plutus.core.derivative.SettlementStyle._;
 import org.ccw.plutus.core.model.base.Instrument
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 class FutureContractSpec(
   val underlying: Instrument,

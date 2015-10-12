@@ -31,6 +31,9 @@ dist
 test-output
 build.log
 
+.cache-main
+.cache-tests
+
 # other scm
 .svn
 .CVS

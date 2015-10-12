@@ -3,7 +3,7 @@ package org.ccw.plutus.core.derivative.option.pricing
 
 
 import org.ccw.plutus.core.derivative.option.model.VanillaOption
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 
 trait OptionStatistic {

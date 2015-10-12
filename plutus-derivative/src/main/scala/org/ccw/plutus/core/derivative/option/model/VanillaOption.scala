@@ -3,7 +3,7 @@ package org.ccw.plutus.core.derivative.option.model
 import java.util.Date
 import org.ccw.plutus.core.model.base.Instrument
 import org.ccw.plutus.core.derivative.SettlementStyle._
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 trait VanillaOption extends BaseOption {
 

@@ -3,7 +3,7 @@ package org.ccw.plutus.core.derivative.futures
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.scalatest.BeforeAndAfter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,7 +30,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
 
   var interestRateFuturesUrl = ""
   var euroDollarFuturesUrl = ""
-  val today = new LocalDate
+  val today = LocalDate.now()
 
   before {
     interestRateFuturesUrl = "http://www.cmegroup.com/trading/interest-rates/stir/30-day-federal-fund.html"
@@ -38,7 +38,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
   }
 
   "Futures Date Convertor " should " process date to next decade" in {
-    val year2019 = new LocalDate(2019, 1, 31)
+    val year2019 = LocalDate.of(2019, 1, 31)
 
     val (month, year) = CMEFutures.getMonthFromCodes("G5", year2019)
 
@@ -47,7 +47,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
 
   it should " process date to same decade" in {
 
-    val year2010 = new LocalDate(2010, 12, 31)
+    val year2010 = LocalDate.of(2010, 12, 31)
 
     val (month, year) = CMEFutures.getMonthFromCodes("Z5", year2010)
 
@@ -73,7 +73,7 @@ class InterestRateFutureSpec extends FlatSpec with BeforeAndAfter {
     val r = CMEFutures.getFuturePrice(euroDollarFuturesUrl, "ZQ", today)
     r foreach {
       case (year, month, p) =>{
-        InterestRateFuture.impliedProbabilityFromFuturesPrice(p.toDouble, 0.25, new LocalDate)
+        InterestRateFuture.impliedProbabilityFromFuturesPrice(p.toDouble, 0.25, LocalDate.now)
       }
     }
   }
