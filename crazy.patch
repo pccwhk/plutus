@@ -1,0 +1,139 @@
+From a0f5dc7a5152db9cb68843357d45eaa9128594a4 Mon Sep 17 00:00:00 2001
+From: pccwhk <test@test.com>
+Date: Tue, 13 Oct 2015 19:10:53 +0800
+Subject: [PATCH] Add test for Asset Price
+
+---
+ .../ccw/plutus/core/model/price/AssetPrice.scala   | 24 ++++++
+ .../plutus/core/model/price/AssetPriceSpec.scala   | 86 ++++++++++++++++++++++
+ 2 files changed, 110 insertions(+)
+ create mode 100644 plutus-core/src/main/scala/org/ccw/plutus/core/model/price/AssetPrice.scala
+ create mode 100644 plutus-core/src/test/scala/org/ccw/plutus/core/model/price/AssetPriceSpec.scala
+
+diff --git a/plutus-core/src/main/scala/org/ccw/plutus/core/model/price/AssetPrice.scala b/plutus-core/src/main/scala/org/ccw/plutus/core/model/price/AssetPrice.scala
+new file mode 100644
+index 0000000..c9cca78
+--- /dev/null
++++ b/plutus-core/src/main/scala/org/ccw/plutus/core/model/price/AssetPrice.scala
+@@ -0,0 +1,24 @@
++package org.ccw.plutus.core.model.price
++
++import slick.driver.H2Driver.api._
++import slick.lifted.{ ProvenShape, ForeignKeyQuery }
++
++object AssetPrices extends TableQuery(new AssetPrice(_)) {
++  val findByInstrumentCode = this.findBy(_.instrumentCode)
++}
++
++class AssetPrice(tag: Tag) extends Table[(String, java.sql.Date, BigDecimal, BigDecimal, BigDecimal, BigDecimal)](tag, "asset_price") {
++
++  //def id = column[Int]("ID", O.PrimaryKey)
++  def instrumentCode = column[String]("INSTR_CODE")
++  def date = column[java.sql.Date]("DATE")
++  def openPrice = column[BigDecimal]("OPEN_PRICE")
++  def highPrice = column[BigDecimal]("HIGH_RPICE")
++  def lowPrice = column[BigDecimal]("LOW_PRICE")
++  def closePrice = column[BigDecimal]("CLOSE_PRICE")
++
++  def * : ProvenShape[(String, java.sql.Date, BigDecimal, BigDecimal, BigDecimal, BigDecimal)] =
++    (instrumentCode, date, openPrice, highPrice, lowPrice, closePrice)
++    
++  def pk = primaryKey("pk_1", (instrumentCode, date))
++}
+\ No newline at end of file
+diff --git a/plutus-core/src/test/scala/org/ccw/plutus/core/model/price/AssetPriceSpec.scala b/plutus-core/src/test/scala/org/ccw/plutus/core/model/price/AssetPriceSpec.scala
+new file mode 100644
+index 0000000..693730d
+--- /dev/null
++++ b/plutus-core/src/test/scala/org/ccw/plutus/core/model/price/AssetPriceSpec.scala
+@@ -0,0 +1,86 @@
++package org.ccw.plutus.core.model.price
++
++import org.scalatest.FlatSpec
++import org.junit.runner.RunWith
++import org.scalatest.junit.JUnitRunner
++import slick.driver.H2Driver.api._
++import org.scalatest.concurrent.ScalaFutures
++import scala.concurrent._
++import scala.concurrent.ExecutionContext.Implicits.global
++
++import org.scalatest.time.{ Millis, Seconds, Span }
++
++@RunWith(classOf[JUnitRunner])
++class PriceSpec extends FlatSpec with ScalaFutures {
++
++  implicit val defaultPatience =
++    PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
++
++  val s = AssetPrices.schema
++
++  val db = Database.forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
++
++  val setupTable = DBIO.seq(s.create)
++
++  db.run(setupTable)
++
++  "Price Table " should " be auto-genertaed" in {
++    val a = new java.sql.Date(System.currentTimeMillis())
++    val price = new java.math.BigDecimal("0.1")
++    val dataSetUp = DBIO.seq(
++      //s.create,
++      AssetPrices ++= Seq(
++        ("0005.HK", a, price, price, price, price),
++        ("0005.HK", a, price, price, price, price) //("0005.HK", a, price, price, price, price)
++        ))
++    val futuure = db.run(dataSetUp)
++    //setupFutuure.onSuccess { case x => println("success for table creation and data injection")}
++    //setupFutuure.onFailure { case f => println("failures")}
++    whenReady(futuure.failed) {
++      result => println("##########I am good ar " + result.toString)
++    }
++
++    Thread.sleep(1000)
++
++  }
++
++  "Query SQL " should " be able to look up insturment " in {
++    val f = AssetPrices.findByInstrumentCode
++    val c = f("0015.HK")
++    val now = new java.sql.Date(System.currentTimeMillis())
++    val price = new java.math.BigDecimal("0.1")
++    val dataSetUp = DBIO.seq(
++      AssetPrices ++= Seq(
++        ("0015.HK", now, price, price, price, price)))
++
++    val future = db.run(c.result)
++
++    whenReady(future) {
++      result =>
++        {
++          println result
++        }
++    }
++  }
++
++  "Price Data " should "be able to persist from Model to DB" in {
++    val now = new java.sql.Date(System.currentTimeMillis())
++    val price = new java.math.BigDecimal("0.2")
++    val add = AssetPrices += ("0009.HK", now, price, price, price, price)
++    
++    val future = db.run(add)
++    
++    val symbolFilter = AssetPrices.filter(_.instrumentCode === "0009.HK")
++    
++    val q = for {
++      c <- AssetPrices if c.instrumentCode === "0009.HK"
++    } yield (c.highPrice)
++    
++    val f = db.run(q.result)
++    whenReady(f) {
++      x => x foreach println
++    }
++    
++    //symbolFilter.update
++  }
++}
+\ No newline at end of file
+-- 
+1.7.11.msysgit.1
+
